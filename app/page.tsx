@@ -1,9 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { setToken } from '@/redux/auth/auth.slice';
+import { setToken, setUser } from '@/redux/auth/auth.slice';
 import useAuthSession from '../hooks/useAuthSession';
 import { useAppDispatch } from '@/redux/store';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+
 
 const HomePage = () => {
   const [username, setUsername] = useState('');
@@ -13,6 +16,30 @@ const HomePage = () => {
 
   const handleLogin = async () => {
     // Implement the logic to authenticate the user
+     
+    try {
+      if(password && username)
+        {
+           const senddata = await axios.post('/api/login' ,
+              {
+                username ,
+                password
+              }
+           )
+  
+           toast.success('User is Login sucessfully')
+                        
+           dispatch(setToken(senddata.data.data))
+           dispatch(setUser({username}))
+        }
+    
+    } catch (error) {
+      toast.error('login failed')
+      console.log('Login failed' ,error)
+
+    }
+        
+     
   };
 
   return (
@@ -20,7 +47,10 @@ const HomePage = () => {
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
         {user ? (
           <div>
-            <h2 className="text-xl font-bold">Welcome, {user.username}</h2>
+            <h2 className="text-xl font-bold text-black">Welcome, {user.username}</h2>
+            {
+              toast.success('user is authenticated')
+            }
           </div>
         ) : (
           <div>
